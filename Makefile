@@ -1,5 +1,5 @@
 # Variables are documented in hack/build.sh.
-BASE_IMAGE_NAME = mariadb
+BASE_IMAGE_NAME = mariadb garbd
 VERSIONS = 10.3 10.5
 OPENSHIFT_NAMESPACES = 
 DOCKER_BUILD_CONTEXT = ..

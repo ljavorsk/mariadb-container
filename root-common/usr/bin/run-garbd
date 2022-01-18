@@ -1,0 +1,16 @@
+#!/bin/bash
+
+export_vars=$(cgroup-limits); export $export_vars
+source ${CONTAINER_SCRIPTS_PATH}/common.sh
+set -eu
+if [[ -v DEBUG_IGNORE_SCRIPT_FAILURES ]]; then
+  set +e
+fi
+
+# Edit the conf file so the Arbitrator knows to which cluster it should connect
+#sed -i -e "/GALERA_NODES=\"\"/a\GALERA_NODES=\"$CLUSTERS_IP4\"" /etc/sysconfig/garb
+#sed -i -e "s/\# GALERA_GROUP=\"\"/GALERA_GROUP=\"my_wsrep_cluster\"/" /etc/sysconfig/garb
+echo "GALERA_NODES=\"$CLUSTERS_IP4\"" >> /etc/sysconfig/garb
+echo "GALERA_GROUP=\"my_wsrep_cluster\"" >> /etc/sysconfig/garb
+
+exec ${MYSQL_PREFIX}/sbin/garbd-wrapper

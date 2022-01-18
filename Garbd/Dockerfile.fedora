@@ -1,0 +1,52 @@
+FROM registry.fedoraproject.org/f33/s2i-core:latest
+
+# Galera Arbitrator image for OpenShift
+#
+# Enviroment:
+# * $CLUSTERS_IP4 - IP adresses of all cluster nodes
+# * $CLUSTER_NAME - Name of the cluster
+
+ENV NAME=garbd \
+    ARCH=x86_64 \
+    SUMMARY="Galera Arbitrator for Galera Cluster" \
+    DESCRIPTION="Galera Arbitrator is a member of a cluster that participates in voting, \
+but not in the actual replication. While Galera Arbitrator does not participate in replication, \
+it does receive the same data as all other nodes."
+
+LABEL summary="$SUMMARY" \
+      description="$DESCRIPTION" \
+      io.k8s.description="Galera Arbitrator is a member of a cluster that participates in voting, but not in the actual replication" \
+      io.k8s.display-name="Galera Arbitrator" \
+      io.openshift.expose-services="4567:mysql,4568:mysql,4444:mysql" \
+      io.openshift.tags="database,mysql,mariadb,galera,garbd" \
+      com.redhat.component="$NAME" \
+      name="$FGC/$NAME" \
+      usage="docker run -d -e CLUSTERS_IP4=<ip_adresses_comma_separated> -e CLUSTER_NAME=cluster -p 4567:4567 $FGC/$NAME" \
+      maintainer="SoftwareCollections.org <sclorg@redhat.com>"
+
+EXPOSE 4567 4568 4444
+
+# This image must forever use UID 27 for mysql user so our volumes are
+# safe in the future. This should *never* change, the last test is there
+# to make sure of that.
+# Adding ownership to the garb conf file to the mysql user
+RUN INSTALL_PKGS="policycoreutils rsync tar gettext hostname bind-utils groff-base procps-ng galera" && \
+    dnf install -y --setopt=tsflags=nodocs $INSTALL_PKGS && \
+    rpm -V $INSTALL_PKGS && \
+    dnf clean all && \
+    chmod 765 /etc/sysconfig/garb
+
+# Get prefix path and path to scripts rather than hard-code them in scripts
+ENV CONTAINER_SCRIPTS_PATH=/usr/share/container-scripts/mysql \
+    MYSQL_PREFIX=/usr
+
+COPY Garbd/root-common /
+COPY Garbd/s2i-common/bin/ $STI_SCRIPTS_PATH
+COPY Garbd/root /
+
+ENV GARBD=''
+
+USER 27
+
+ENTRYPOINT ["container-entrypoint"]
+CMD ["run-garbd"]
