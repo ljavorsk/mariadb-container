@@ -1,0 +1,9 @@
+[mysqld]
+# Galera configuration
+wsrep_on=1
+wsrep_provider=/usr/lib64/galera/libgalera_smm.so
+wsrep_cluster_name="my_wsrep_cluster"
+wsrep_certify_nonPK=1
+binlog_format=ROW
+innodb_autoinc_lock_mode=2
+default-storage-engine=innodb

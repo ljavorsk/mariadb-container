@@ -14,6 +14,15 @@ log_volume_info $MYSQL_DATADIR
 # pre-init files
 process_extending_files ${APP_DATA}/mysql-pre-init/ ${CONTAINER_SCRIPTS_PATH}/pre-init/
 
+WSREP_NEW_CLUSTER_OPTION=""
+# Init galera (only for the first node in the cluster)
+if [[ -v GALERA_INIT ]]; then
+    cp /usr/share/container-scripts/mysql/65-galera.cnf /etc/my.cnf.d/
+    sed -i -e "/\[mysqld\]/a\wsrep_cluster_address=gcomm://" /etc/my.cnf.d/65-galera.cnf
+    WSREP_NEW_CLUSTER_OPTION="--wsrep-new-cluster"
+fi
+
+
 if [ ! -d "$MYSQL_DATADIR/mysql" ]; then
   initialize_database "$@"
 else
@@ -28,4 +37,18 @@ shutdown_local_mysql
 unset_env_vars
 log_volume_info $MYSQL_DATADIR
 log_info 'Running final exec -- Only MySQL server logs after this point'
-exec ${MYSQL_PREFIX}/libexec/mysqld --defaults-file=$MYSQL_DEFAULTS_FILE "$@" 2>&1
+
+# Galera cluster nodes
+if [[ -v CLUSTERS_IP4 ]]; then
+    if [[ ! -z  "$CLUSTERS_IP4" ]]; then
+        cp /usr/share/container-scripts/mysql/65-galera.cnf /etc/my.cnf.d/
+
+        # Add cluster nodes IPs
+        sed -i -e "/\[mysqld\]/a\wsrep_cluster_address=gcomm://$CLUSTERS_IP4" /etc/my.cnf.d/65-galera.cnf
+    else
+        echo "ERROR: The 'CLUSTERS_IP4' variable is empty, please set the variable to the IP addresses of all cluster nodes"
+        exit 1
+    fi
+fi
+
+exec ${MYSQL_PREFIX}/libexec/mysqld --defaults-file=$MYSQL_DEFAULTS_FILE $WSREP_NEW_CLUSTER_OPTION "$@" 2>&1
