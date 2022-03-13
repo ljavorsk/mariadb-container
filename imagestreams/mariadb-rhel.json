@@ -27,6 +27,40 @@
         }
       },
       {
+        "name": "10.5-el8-galera",
+        "annotations": {
+          "openshift.io/display-name": "MariaDB Galera (RHEL-8)",
+          "openshift.io/provider-display-name": "Red Hat, Inc.",
+          "description": "Provides a MariaDB database on RHEL. For more information about using this database image, including OpenShift considerations, see https://github.com/sclorg/mariadb-container/tree/master/10.5/README.md.",
+          "iconClass": "icon-mariadb",
+          "tags": "database,mariadb"
+        },
+        "from": {
+          "kind": "DockerImage",
+          "name": "quay.io/ljavorsk/mariadb-galera-init"
+        },
+        "referencePolicy": {
+          "type": "Local"
+        }
+      },
+      {
+        "name": "garbd-el8",
+        "annotations": {
+          "openshift.io/display-name": "Galera arbitrator (RHEL-8)",
+          "openshift.io/provider-display-name": "Red Hat, Inc.",
+          "description": "Provides a Galera Arbitrator which is part of the Galera cluster. For more information about using this software, see https://github.com/sclorg/mariadb-container/tree/master/Garbd/README.md.",
+          "iconClass": "icon-mariadb",
+          "tags": "database,mariadb,garbd"
+        },
+        "from": {
+          "kind": "DockerImage",
+          "name": "quay.io/ljavorsk/garbd"
+        },
+        "referencePolicy": {
+          "type": "Local"
+        }
+      },
+      {
         "name": "10.3-el8",
         "annotations": {
           "openshift.io/display-name": "MariaDB 10.3 (RHEL 8)",
