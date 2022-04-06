@@ -1,0 +1,41 @@
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  name: mariadb-database
+spec:
+  replicas: 1
+  selector:
+    app: mariadb-database
+    deploymentconfig: mariadb-database
+  strategy:
+    type: Rolling
+  template:
+    metadata:
+      labels:
+        app: mariadb-database
+        deploymentconfig: mariadb-database
+        name: mariadb-database
+    spec:
+      containers:
+      - env:
+        - name: GALERA_INIT
+        - name: MYSQL_DATABASE
+          value: db
+        - name: MYSQL_PASSWORD
+          value: pass
+        - name: MYSQL_USER
+          value: user
+        image: "image-registry.openshift-image-registry.svc:5000/mariadb-galera/mariadb@sha256:8fc3716462cfdce75686a80598e0050ea0c01fff03facf561c15efb9d32110e0"
+        name: mariadb-database
+        ports:
+          - containerPort: 3306
+            protocol: TCP
+          - containerPort: 4444
+            protocol: TCP
+          - containerPort: 4567
+            protocol: TCP
+          - containerPort: 4568
+            protocol: TCP
+  triggers:
+    - type: "ConfigChange"
+  revisionHistoryLimit: 2
