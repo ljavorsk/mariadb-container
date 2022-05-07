@@ -54,6 +54,7 @@ ENV CONTAINER_SCRIPTS_PATH=/usr/share/container-scripts/mysql \
 COPY 10.5/root-common /
 COPY 10.5/s2i-common/bin/ $STI_SCRIPTS_PATH
 COPY 10.5/root /
+COPY test/check-galera-connection.sh /
 
 # this is needed due to issues with squash
 # when this directory gets rm'd by the container-setup

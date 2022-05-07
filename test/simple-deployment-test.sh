@@ -24,7 +24,7 @@ TESTING_MARIADB_CONTAINER_IP="10.11.0.10"
 GARBD_CONTAINER_IP="10.11.0.5"
 
 # Docker tags for images
-MARIADB_IMAGE_TAG="quay.io/ljavorsk/mariadb-galera-init"
+MARIADB_IMAGE_TAG="quay.io/ljavorsk/mariadb-galera"
 GARBD_IMAGE_TAG="quay.io/ljavorsk/garbd"
 
 USERNAME="user"
